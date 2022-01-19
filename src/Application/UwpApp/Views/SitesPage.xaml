@@ -1,0 +1,113 @@
+﻿<Page
+    x:Class="NeoIISM.Application.UwpApp.Views.SitesPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:converters="using:Microsoft.Toolkit.Uwp.UI.Converters"
+    xmlns:muxc="using:Microsoft.UI.Xaml.Controls"
+    xmlns:ui="using:NeoIISM.Application.UI"
+    xmlns:local="using:NeoIISM.Application.UwpApp.Views"
+    mc:Ignorable="d"
+    NavigationCacheMode="Enabled">
+
+    <Page.Resources>
+        <x:String x:Key="DeleteSiteIcon">&#xE74D;</x:String>
+        <x:String x:Key="StartSiteIcon">&#xE768;</x:String>
+        <x:String x:Key="StopSiteIcon">&#xE71A;</x:String>
+
+        <converters:BoolNegationConverter x:Key="BoolNegationConverter"/>
+        <converters:BoolToObjectConverter x:Key="IsRunningBadgeStyleConverter" TrueValue="{StaticResource SuccessDotInfoBadgeStyle}" FalseValue="{StaticResource CriticalDotInfoBadgeStyle}" />
+        <converters:BoolToObjectConverter x:Key="IsRunningBadgeTooltipTextConverter" TrueValue="Running" FalseValue="Stopped" />
+        <converters:BoolToObjectConverter x:Key="ToggleSiteIconConverter" TrueValue="{StaticResource StopSiteIcon}" FalseValue="{StaticResource StartSiteIcon}" />
+        <converters:BoolToObjectConverter x:Key="ToggleSiteTooltipConverter" TrueValue="Stop" FalseValue="Start" />
+    </Page.Resources>
+
+    <Grid>
+        <ListView
+            ItemsSource="{x:Bind ViewModel.Sites}"
+            SelectionChanged="OnSelectedAppPoolChanged"
+            SelectionMode="Single">
+
+            <ListView.ItemTemplate>
+                <DataTemplate x:DataType="ui:SiteItem">
+                    <Grid Padding="0,10,0,10">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+
+                        <Grid.RowDefinitions>
+                            <RowDefinition MinHeight="40" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+
+                        <StackPanel Orientation="Horizontal">
+                            <ToolTipService.ToolTip>
+                                <ToolTip>
+                                    <StackPanel Orientation="Horizontal">
+                                        <muxc:InfoBadge
+                                            Margin="0,0,5,0"
+                                            Style="{x:Bind IsSiteRunning, Converter={StaticResource IsRunningBadgeStyleConverter}, Mode=OneWay}"
+                                            VerticalAlignment="Center">
+                                        </muxc:InfoBadge>
+
+                                        <TextBlock
+                                            Text="{x:Bind IsSiteRunning, Converter={StaticResource IsRunningBadgeTooltipTextConverter}, Mode=OneWay}"
+                                            VerticalAlignment="Center" />
+                                    </StackPanel>
+                                </ToolTip>
+                            </ToolTipService.ToolTip>
+
+                            <muxc:InfoBadge
+                                Margin="5,0,5,0"
+                                Style="{x:Bind IsSiteRunning, Converter={StaticResource IsRunningBadgeStyleConverter}, Mode=OneWay}"
+                                VerticalAlignment="Center">
+                                <!--Visibility="{x:Bind local:SitesPage.IsRunningBadgeVisible(IsSelected, IsSiteRunning), Mode=OneWay}">-->
+                            </muxc:InfoBadge>
+
+                            <TextBlock
+                                Margin="5,0,5,0"
+                                Text="{x:Bind SiteName, Mode=OneWay}"
+                                VerticalAlignment="Center" />
+                        </StackPanel>
+
+                        <StackPanel
+                            Grid.Column="1"
+                            Orientation="Horizontal">
+
+                            <Button
+                                IsEnabled="False"                            
+                                Command="{x:Bind ToggleCommand}"
+                                Margin="2.5,0,2.5,0"
+                                ToolTipService.ToolTip="{x:Bind IsSiteRunning, Converter={StaticResource ToggleSiteTooltipConverter}, Mode=OneWay}"
+                                HorizontalAlignment="Right"
+                                Visibility="{x:Bind IsSelected, Mode=OneWay}">
+
+                                <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}"  Glyph="{x:Bind Path=IsSiteRunning, Converter={StaticResource ToggleSiteIconConverter}, Mode=OneWay}" />
+                            </Button>
+
+                            <!--<Button
+                                    Grid.Column="3"
+                                    Margin="2.5,0,2.5,0"
+                                    ToolTipService.ToolTip="Delete"
+                                    Visibility="{x:Bind IsSelected, Mode=OneWay}">
+
+                                    <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="{StaticResource DeleteSiteIcon}" />                            
+                                </Button>-->
+                        </StackPanel>
+
+                        <muxc:ProgressBar
+                            Grid.ColumnSpan="2"
+                            Grid.Row="2"
+                            IsIndeterminate="True"
+                            VerticalAlignment="Bottom"
+                            Visibility="{x:Bind IsBusy, Mode=OneWay}" />
+                    </Grid>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
+
+        <muxc:ProgressRing IsIndeterminate="True" Visibility="{x:Bind ViewModel.ReloadDataCommand.IsRunning, Mode=OneWay}" />
+    </Grid>
+</Page>

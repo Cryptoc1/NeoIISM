@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<assembly
+  xmlns='urn:schemas-microsoft-com:asm.v1'
+  xmlns:asmv2='urn:schemas-microsoft-com:asm.v2'
+  xmlns:asmv3='urn:schemas-microsoft-com:asm.v3'
+  xmlns:xdt="http://schemas.microsoft.com/XML-Document-Transform">
+
+    <asmv2:trustInfo>
+        <asmv2:security>
+            <asmv3:requestedPrivileges>
+                <asmv3:requestedExecutionLevel level='requireAdministrator' xdt:Transform="SetAttributes(level)" />
+            </asmv3:requestedPrivileges>
+        </asmv2:security>
+    </asmv2:trustInfo>
+
+</assembly>

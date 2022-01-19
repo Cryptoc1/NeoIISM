@@ -1,0 +1,12 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.Toolkit.Mvvm" Version="7.1.2" />
+        <PackageReference Include="Nito.AsyncEx" Version="5.1.2" />
+    </ItemGroup>
+    
+    <ItemGroup>
+        <ProjectReference Include="$(SrcDirectory)\Infrastructure\Infrastructure\NeoIISM.Infrastructure.csproj" />
+    </ItemGroup>
+    
+</Project>

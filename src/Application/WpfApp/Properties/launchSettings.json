@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "NeoIISM.Wpf.App": {
+      "commandName": "Project",
+      "nativeDebugging": true
+    }
+  }
+}

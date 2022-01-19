@@ -1,0 +1,8 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.Web.Administration" Version="11.1.0" />
+        <PackageReference Include="Nito.AsyncEx" Version="5.1.2" />
+    </ItemGroup>
+
+</Project>

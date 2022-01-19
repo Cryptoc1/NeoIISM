@@ -1,0 +1,13 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <ItemGroup>
+        <PackageReference Include="AutoMapper" Version="10.1.1" />
+        <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="8.1.1" />
+        <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="6.0.0" />
+    </ItemGroup>
+    
+    <ItemGroup>
+        <ProjectReference Include="$(SrcDirectory)\Infrastructure\WebAdministration\NeoIISM.Infrastructure.WebAdministration.csproj" />
+    </ItemGroup>
+
+</Project>
