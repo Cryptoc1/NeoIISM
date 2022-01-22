@@ -22,6 +22,7 @@
             OpenPaneLength="250"
             PaneDisplayMode="LeftCompact"
             IsBackButtonVisible="Collapsed"
+            IsSettingsVisible="False"
             IsTabStop="False"
             IsTitleBarAutoPaddingEnabled="False"
             SelectionChanged="OnNavSelectionChanged">

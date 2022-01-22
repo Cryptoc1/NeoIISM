@@ -19,11 +19,11 @@ public sealed partial class SitesPage : Page
         Unloaded += OnUnloaded;
     }
 
-    private static Visibility IsRunningBadgeVisible( bool isSelected, bool isRunning )
-        => isRunning || isSelected ? Visibility.Visible : Visibility.Collapsed;
-
     private void OnLoaded( object sender, RoutedEventArgs e )
-        => ViewModel.ReloadDataCommand.ExecuteAsync( default );
+    {
+        ViewModel.IsActive = true;
+        ViewModel.ReloadDataCommand.ExecuteAsync( default );
+    }
 
     private void OnSelectedAppPoolChanged( object sender, SelectionChangedEventArgs args )
     {
@@ -31,10 +31,13 @@ public sealed partial class SitesPage : Page
         {
             item.IsSelected = false;
             item.ReloadDataCommand.Cancel();
+
+            item.IsActive = false;
         }
 
         foreach( var item in args.AddedItems.Cast<SiteItem>() )
         {
+            item.IsActive = true;
             item.IsSelected = true;
             if( !item.IsBusy && !item.ReloadDataCommand.IsRunning )
             {
@@ -44,5 +47,8 @@ public sealed partial class SitesPage : Page
     }
 
     private void OnUnloaded( object sender, RoutedEventArgs args )
-        => ViewModel.ReloadDataCommand.Cancel();
+    {
+        ViewModel.ReloadDataCommand.Cancel();
+        ViewModel.IsActive = false;
+    }
 }

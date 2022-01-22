@@ -10,7 +10,7 @@ using Nito.AsyncEx;
 
 namespace NeoIISM.Application.UI;
 
-public class ApplicationPoolsViewModel : ObservableRecipient
+public class ApplicationPoolsViewModel : ObservableRecipient, IRecipient<ApplicationPoolDeletedMessage>
 {
     #region Fields
     private readonly IServerManagerClient serverManagerClient;
@@ -19,7 +19,7 @@ public class ApplicationPoolsViewModel : ObservableRecipient
 
     #region Properties
     public ObservableCollection<ApplicationPoolItem> ApplicationPools { get; }
-    public IAsyncRelayCommand ReloadDataCommand { get; }
+    public IAsyncLockRelayCommand ReloadDataCommand { get; }
     #endregion
 
     public ApplicationPoolsViewModel(
@@ -33,6 +33,15 @@ public class ApplicationPoolsViewModel : ObservableRecipient
 
         this.serverManagerClient = serverManagerClient;
         this.serviceProvider = serviceProvider;
+    }
+
+    public void Receive( ApplicationPoolDeletedMessage message )
+    {
+        using( ReloadDataCommand.AsyncLock.Lock() )
+        {
+            var appPool = ApplicationPools.Single( appPool => appPool.AppPoolName == message.AppPoolName );
+            ApplicationPools.Remove( appPool );
+        }
     }
 
     private async Task ReloadDataAsync( CancellationToken cancellation )
@@ -78,6 +87,7 @@ public class ApplicationPoolItem : ObservableRecipient
     public bool IsSelected { get => isSelected; set => SetProperty( ref isSelected, value ); }
     public string AppPoolName => name;
 
+    public IAsyncRelayCommand DeleteCommand { get; }
     public IAsyncRelayCommand RecycleCommand { get; }
     public IAsyncRelayCommand ReloadDataCommand { get; }
     public IAsyncRelayCommand StartCommand => startCommand;
@@ -88,6 +98,7 @@ public class ApplicationPoolItem : ObservableRecipient
     public ApplicationPoolItem( string name, IMessenger messenger, IServerManagerClient serverManagerClient )
         : base( messenger )
     {
+        DeleteCommand = new AppPoolCommand( this, DeleteAsync );
         RecycleCommand = new AppPoolCommand( this, RecycleAsync );
         ReloadDataCommand = new AppPoolCommand( this, ReloadDataAsync );
         ToggleCommand = new AppPoolCommand( this, ToggleAsync );
@@ -97,6 +108,26 @@ public class ApplicationPoolItem : ObservableRecipient
         this.serverManagerClient = serverManagerClient;
         startCommand = new AppPoolCommand( this, StartAsync );
         stopCommand = new AppPoolCommand( this, StopAsync );
+    }
+
+    private async Task DeleteAsync( CancellationToken cancellation )
+    {
+        bool deleted = await serverManagerClient.OpenAsync(
+            serverManager =>
+            {
+                var appPool = serverManager.ApplicationPools[ name ];
+                serverManager.ApplicationPools.Remove( appPool );
+
+                serverManager.CommitChanges();
+                return serverManager.ApplicationPools[ name ] is null;
+            },
+            cancellation
+        );
+
+        if( deleted )
+        {
+            Messenger.Send( new ApplicationPoolDeletedMessage( name ) );
+        }
     }
 
     private async Task RecycleAsync( CancellationToken cancellation )
@@ -144,7 +175,7 @@ public class ApplicationPoolItem : ObservableRecipient
 
     private async Task StopAsync( CancellationToken cancellation )
     {
-        bool isStopped = await serverManagerClient.OpenAsync(
+        bool stopped = await serverManagerClient.OpenAsync(
             async ( serverManager, cancellation ) =>
             {
                 var appPool = serverManager.ApplicationPools[ name ];
@@ -164,7 +195,7 @@ public class ApplicationPoolItem : ObservableRecipient
             cancellation
         );
 
-        IsAppPoolRunning = !isStopped;
+        IsAppPoolRunning = !stopped;
     }
 
     private async Task ToggleAsync( CancellationToken cancellation )
@@ -218,4 +249,14 @@ public class ApplicationPoolItem : ObservableRecipient
         public bool CanExecute( object parameter ) => command.CanExecute( parameter );
         public void Execute( object parameter ) => command.Execute( parameter );
     }
+}
+
+public class ApplicationPoolDeletedMessage
+{
+    #region Properties
+    public string AppPoolName { get; }
+    #endregion
+
+    public ApplicationPoolDeletedMessage( string name )
+        => AppPoolName = name;
 }

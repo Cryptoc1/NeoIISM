@@ -7,7 +7,6 @@
     xmlns:converters="using:Microsoft.Toolkit.Uwp.UI.Converters"
     xmlns:muxc="using:Microsoft.UI.Xaml.Controls"
     xmlns:ui="using:NeoIISM.Application.UI"
-    xmlns:local="using:NeoIISM.Application.UwpApp.Views"
     mc:Ignorable="d"
     NavigationCacheMode="Enabled">
 
@@ -99,14 +98,26 @@
                                 <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="{StaticResource RecycleAppPoolIcon}" />
                             </Button>
 
-                            <!--<Button
-                                    Grid.Column="3"
-                                    Margin="2.5,0,2.5,0"
-                                    ToolTipService.ToolTip="Delete"
-                                    Visibility="{x:Bind IsSelected, Mode=OneWay}">
+                            <Button
+                                Margin="2.5,0,2.5,0"
+                                ToolTipService.ToolTip="Delete"
+                                Visibility="{x:Bind IsSelected, Mode=OneWay}">
 
-                                    <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="{StaticResource DeleteAppPoolIcon}" />                            
-                                </Button>-->
+                                <Button.Flyout>
+                                    <Flyout>
+                                        <StackPanel>
+                                            <TextBlock
+                                                Margin="0,0,0,10"
+                                                Style="{ThemeResource BaseTextBlockStyle}"
+                                                Text="Are you sure you'd like to delete this Application Pool?" />
+
+                                            <Button Command="{x:Bind DeleteCommand}" Content="Confirm" />
+                                        </StackPanel>
+                                    </Flyout>
+                                </Button.Flyout>
+
+                                <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="{StaticResource DeleteAppPoolIcon}" />
+                            </Button>
                         </StackPanel>
 
                         <muxc:ProgressBar
